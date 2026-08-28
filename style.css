@@ -627,47 +627,252 @@ html, body {
 }
 
 @media (max-width: 768px) {
+  /* --- Loader --- */
   .loader-logo-text {
     font-size: 2.5rem;
   }
 
-  #camera-controls {
-    right: auto;
-    left: 50%;
-    top: auto;
-    bottom: 70px;
-    transform: translateX(-50%);
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
+  /* --- Top bar --- */
+  #top-bar {
+    padding: 10px 12px;
   }
 
+  /* --- Hint drawer (left side) --- */
+  #hint-drawer {
+    top: 14px;
+  }
+
+  .hint-panel {
+    height: 36px;
+    padding: 0 12px;
+  }
+
+  .hint-text {
+    font-size: 0.7rem;
+    white-space: normal;
+    max-width: 220px;
+    line-height: 1.3;
+  }
+
+  .hint-toggle-btn {
+    right: -30px;
+    width: 30px;
+    height: 36px;
+  }
+
+  /* --- FPS counter --- */
+  .fps-counter {
+    right: 12px;
+    top: 14px;
+    font-size: 0.75rem;
+  }
+
+  /* --- Music button --- */
+  .music-btn {
+    top: 14px;
+    right: 64px;
+  }
+
+  /* --- Camera drawer — top sheet container (pops down from top) --- */
+  #camera-drawer {
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: none !important;
+    transition: none;
+    pointer-events: none;
+    z-index: 150;
+  }
+
+  /* Toggle button handle (attached at bottom of top panel) */
+  .cam-toggle-btn {
+    position: relative;
+    pointer-events: auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    flex-shrink: 0;
+    width: 64px;
+    height: 28px;
+    border-radius: 0 0 14px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: none;
+    box-shadow: none;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cam-toggle-btn:hover {
+    transform: none;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .cam-toggle-btn .toggle-icon {
+    font-size: 0.95rem;
+    color: #ffffff;
+    transform: rotate(90deg); /* Arrow points down when collapsed */
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #camera-drawer.collapsed .toggle-icon {
+    transform: rotate(90deg); /* Points down to expand */
+  }
+
+  #camera-drawer:not(.collapsed) .toggle-icon {
+    transform: rotate(-90deg); /* Points up to collapse */
+  }
+
+  /* Top sheet glass panel */
+  .cam-panel {
+    pointer-events: auto;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: hidden;
+    max-height: 180px;
+    padding: 12px 0 14px 0;
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                padding 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.3s ease;
+  }
+
+  #camera-drawer.collapsed .cam-panel {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Scrollable horizontal pill bar */
+  #camera-controls {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  #camera-controls::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Spacious buttons with transparent background matching panel */
   .cam-btn {
     min-width: auto;
-    padding: 8px 12px;
-    font-size: 0.7rem;
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border-radius: 0;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    scroll-snap-align: center;
+    transition: color 0.25s ease, opacity 0.25s ease;
+    min-height: 38px;
   }
 
   .cam-btn:hover {
     transform: none;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+  }
+
+  .cam-btn.active {
+    transform: none;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    box-shadow: none;
+  }
+
+  .cam-btn.active .cam-label {
+    color: #ffffff;
+    font-weight: 700;
   }
 
   .cam-label {
-    display: none;
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
   }
 
+  .cam-icon {
+    width: 8px;
+    height: 8px;
+  }
+
+  .cam-icon-orbit {
+    font-size: 0.85rem;
+  }
+
+  /* --- Anim controls --- */
   #anim-controls {
-    left: 16px;
-    bottom: 140px;
+    left: 12px;
+    bottom: 80px;
   }
 
-  #top-bar {
-    padding: 12px 16px;
+  /* --- Credit badge --- */
+  #credit-badge {
+    font-size: 0.6rem;
+    padding: 4px 10px;
+    bottom: 0;
   }
 
+  /* --- General hint --- */
   .hint {
     font-size: 0.6rem;
+  }
+}
+
+/* Extra small screens (< 400px) */
+@media (max-width: 400px) {
+  .hint-text {
+    max-width: 160px;
+    font-size: 0.65rem;
+  }
+
+  .cam-btn {
+    padding: 8px 13px;
+    font-size: 0.72rem;
+  }
+
+  .cam-label {
+    font-size: 0.7rem;
+  }
+
+  .fps-counter {
+    font-size: 0.65rem;
+  }
+
+  .music-btn {
+    right: 56px;
   }
 }
 
