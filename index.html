@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Interactive 3D Character Showcase - An immersive web experience featuring animated 3D characters with cinematic camera movements" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Ronova | Interactive Ronova</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <div id="loading-screen">
+    <div class="loader-container">
+      <div class="liquid-bars" id="liquid-bars">
+        <div class="lbar lbar-side" id="lbar-left">
+          <svg class="lbar-svg" viewBox="0 0 40 80" preserveAspectRatio="none">
+            <defs>
+              <clipPath id="clip-left">
+                <rect id="clip-left-rect" x="0" y="80" width="40" height="80" />
+              </clipPath>
+            </defs>
+            <rect x="0" y="0" width="40" height="80" rx="8" ry="8" class="lbar-track" />
+            <g clip-path="url(#clip-left)">
+              <rect x="0" y="0" width="40" height="80" rx="8" ry="8" class="lbar-fill" />
+              <path class="lbar-wave" id="wave-left">
+                <animate attributeName="d" dur="2.1s" repeatCount="indefinite" values="M0,6 Q10,0 20,6 Q30,12 40,6 L40,80 L0,80 Z;
+                          M0,6 Q10,12 20,6 Q30,0 40,6 L40,80 L0,80 Z;
+                          M0,6 Q10,0 20,6 Q30,12 40,6 L40,80 L0,80 Z" />
+              </path>
+            </g>
+          </svg>
+        </div>
+
+        <div class="lbar lbar-center" id="lbar-center">
+          <svg class="lbar-svg" viewBox="0 0 40 110" preserveAspectRatio="none">
+            <defs>
+              <clipPath id="clip-center">
+                <rect id="clip-center-rect" x="0" y="110" width="40" height="110" />
+              </clipPath>
+            </defs>
+            <rect x="0" y="0" width="40" height="110" rx="8" ry="8" class="lbar-track" />
+            <g clip-path="url(#clip-center)">
+              <rect x="0" y="0" width="40" height="110" rx="8" ry="8" class="lbar-fill" />
+              <path class="lbar-wave" id="wave-center">
+                <animate attributeName="d" dur="1.8s" repeatCount="indefinite" values="M0,6 Q10,0 20,6 Q30,12 40,6 L40,110 L0,110 Z;
+                          M0,6 Q10,12 20,6 Q30,0 40,6 L40,110 L0,110 Z;
+                          M0,6 Q10,0 20,6 Q30,12 40,6 L40,110 L0,110 Z" />
+              </path>
+            </g>
+          </svg>
+        </div>
+
+        <div class="lbar lbar-side" id="lbar-right">
+          <svg class="lbar-svg" viewBox="0 0 40 80" preserveAspectRatio="none">
+            <defs>
+              <clipPath id="clip-right">
+                <rect id="clip-right-rect" x="0" y="80" width="40" height="80" />
+              </clipPath>
+            </defs>
+            <rect x="0" y="0" width="40" height="80" rx="8" ry="8" class="lbar-track" />
+            <g clip-path="url(#clip-right)">
+              <rect x="0" y="0" width="40" height="80" rx="8" ry="8" class="lbar-fill" />
+              <path class="lbar-wave" id="wave-right">
+                <animate attributeName="d" dur="2.4s" repeatCount="indefinite" values="M0,6 Q10,0 20,6 Q30,12 40,6 L40,80 L0,80 Z;
+                          M0,6 Q10,12 20,6 Q30,0 40,6 L40,80 L0,80 Z;
+                          M0,6 Q10,0 20,6 Q30,12 40,6 L40,80 L0,80 Z" />
+              </path>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="loader-percentage" id="loader-percent">0%</div>
+    </div>
+  </div>
+
+  <canvas id="three-canvas"></canvas>
+
+  <div id="ui-overlay">
+    <header id="top-bar">
+      <div id="hint-drawer" class="collapsed">
+        <div class="hint-panel">
+          <p class="hint-text">Drag to rotate | Scroll to zoom | Click buttons to switch camera</p>
+        </div>
+        <button id="hint-toggle-btn" class="hint-toggle-btn" title="Toggle Help Controls">
+          <span class="hint-toggle-icon">›</span>
+        </button>
+      </div>
+
+      <div class="fps-counter" id="fps-counter">60 FPS</div>
+    </header>
+
+    <div id="camera-drawer" class="collapsed">
+      <button id="cam-toggle-btn" class="cam-toggle-btn" title="Toggle Camera Controls">
+        <span class="toggle-icon">‹</span>
+      </button>
+
+      <div class="cam-panel">
+        <nav id="camera-controls">
+          <button class="cam-btn active" data-cam="default" id="cam-default">
+            <span class="cam-icon"></span>
+            <span class="cam-label">Default Pose</span>
+          </button>
+          <button class="cam-btn" data-cam="front" id="cam-front">
+            <span class="cam-icon"></span>
+            <span class="cam-label">Front</span>
+          </button>
+          <button class="cam-btn" data-cam="side" id="cam-side">
+            <span class="cam-icon"></span>
+            <span class="cam-label">Side</span>
+          </button>
+          <button class="cam-btn" data-cam="back" id="cam-back">
+            <span class="cam-icon"></span>
+            <span class="cam-label">Back</span>
+          </button>
+          <button class="cam-btn" data-cam="top" id="cam-top">
+            <span class="cam-icon"></span>
+            <span class="cam-label">Top</span>
+          </button>
+          <button class="cam-btn" data-cam="closeup" id="cam-closeup">
+            <span class="cam-icon"></span>
+            <span class="cam-label">Close-Up</span>
+          </button>
+          <button class="cam-btn" data-cam="orbit" id="cam-orbit">
+            <span class="cam-icon cam-icon-orbit">↻</span>
+            <span class="cam-label">Auto Orbit</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <button id="music-btn" class="music-btn muted" title="Toggle Music">
+      <span class="music-note">♫</span>
+    </button>
+
+    <div id="credit-badge">
+      Website Credit By : @ColumbinaHyposeleniasHusband
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+
+</html>
