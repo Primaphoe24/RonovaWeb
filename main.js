@@ -277,7 +277,7 @@ function animate() {
 
   cameraController.update(deltaTime);
   modelLoader.update();
-  particles.update(elapsedTime);
+  particles.update(elapsedTime, deltaTime, camera, modelLoader ? modelLoader.model : null);
 
   if (window.__characterSlot) {
     const opacity = 0.25 + Math.sin(elapsedTime * 2) * 0.15;

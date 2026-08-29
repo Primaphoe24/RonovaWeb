@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CharacterAura } from './characterAura.js';
 
 export class ParticleSystem {
   constructor(scene) {
@@ -7,6 +8,8 @@ export class ParticleSystem {
     this.particleCount = 5000;
     this.particleData = [];
     this.dummy = new THREE.Object3D();
+
+    this.characterAura = new CharacterAura(scene);
 
     this._create();
   }
@@ -90,15 +93,19 @@ export class ParticleSystem {
     this.scene.add(this.instancedMesh);
   }
 
-  update(time) {
+  update(elapsedTime, deltaTime, camera, model) {
+    if (this.characterAura) {
+      this.characterAura.update(elapsedTime, deltaTime, camera, model);
+    }
+
     if (!this.instancedMesh) return;
 
     for (let i = 0; i < this.particleCount; i++) {
       const p = this.particleData[i];
 
-      p.position.x += p.velocity.x + Math.sin(time * 1.5 + p.position.y) * 0.003;
+      p.position.x += p.velocity.x + Math.sin(elapsedTime * 1.5 + p.position.y) * 0.003;
       p.position.y += p.velocity.y;
-      p.position.z += p.velocity.z + Math.cos(time * 1.5 + p.position.x) * 0.003;
+      p.position.z += p.velocity.z + Math.cos(elapsedTime * 1.5 + p.position.x) * 0.003;
 
       p.rotation.x += p.rotSpeed.x;
       p.rotation.y += p.rotSpeed.y;
@@ -122,6 +129,9 @@ export class ParticleSystem {
   }
 
   dispose() {
+    if (this.characterAura) {
+      this.characterAura.dispose();
+    }
     if (this.instancedMesh) {
       this.instancedMesh.geometry.dispose();
       this.instancedMesh.material.dispose();
@@ -129,3 +139,4 @@ export class ParticleSystem {
     }
   }
 }
+

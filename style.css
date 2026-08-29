@@ -804,10 +804,19 @@ html, body {
 
   .cam-btn.active {
     transform: none;
-    background: transparent;
-    border: none;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(40, 4, 12, 0.94) 30%,
+      rgba(150, 8, 28, 0.55) 70%,
+      rgba(80, 5, 18, 0.88) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-left: 2px solid rgba(255, 255, 255, 0.55);
+    border-right: 2px solid #b30024;
+    border-radius: 0;
     color: #ffffff;
-    box-shadow: none;
+    box-shadow: -2px 2px 6px rgba(0, 0, 0, 0.4);
   }
 
   .cam-btn.active .cam-label {
