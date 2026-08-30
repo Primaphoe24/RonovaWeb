@@ -3,8 +3,8 @@ import * as THREE from 'three';
 export function createScene() {
   const scene = new THREE.Scene();
 
-  scene.fog = new THREE.FogExp2(0x050509, 0.022);
-  scene.background = new THREE.Color(0x050509);
+  scene.fog = new THREE.FogExp2(0x0d0407, 0.024);
+  scene.background = new THREE.Color(0x070305);
 
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.15);
   scene.add(ambientLight);
