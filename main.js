@@ -4,6 +4,7 @@ import { ModelLoader } from './src/modelLoader.js';
 import { CameraController } from './src/cameraController.js';
 import { ParticleSystem } from './src/particles.js';
 import { PostProcessingPipeline } from './src/postProcessing.js';
+import { HorrorForestSystem } from './src/forestLoader.js';
 
 const CONFIG = {
   models: {
@@ -70,6 +71,9 @@ async function init() {
   updateLoading(60);
 
   postProcessing = new PostProcessingPipeline(renderer, scene, camera);
+
+  const forestSystem = new HorrorForestSystem(scene);
+  forestSystem.loadForest();
 
   updateLoading(75);
 
