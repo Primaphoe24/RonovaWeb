@@ -1,9 +1,3 @@
-/**
- * typewriterManager.js
- * Manages full-transparent typewriter text effect on camera preset switch
- * with scary horror jitter and demonic glitch keystroke effects.
- */
-
 const PRESET_TEXT_DATA = {
   front: {
     badge: '#1',
@@ -137,19 +131,15 @@ export class TypewriterManager {
     this.exitTimeout = null;
     this.currentPreset = null;
     this.isTyping = false;
-    this.typingSpeed = 4; // ultra-fast responsive horror typing speed (4ms/char)
+    this.typingSpeed = 4;
 
     this._bindContainerTapDismiss();
   }
 
-  /**
-   * Bind tap/click event to dismiss container and halt typing process instantly (ignoring scroll drags)
-   */
   _bindContainerTapDismiss() {
     if (!this.container) return;
 
     this.container.addEventListener('click', (e) => {
-      // Stop click from bleeding into Three.js OrbitControls (Eliminates FPS drop!)
       e.stopPropagation();
 
       if (this.container.classList.contains('visible')) {
@@ -158,9 +148,6 @@ export class TypewriterManager {
     });
   }
 
-  /**
-   * Hide the container quickly with an exit fade animation
-   */
   hide() {
     this.clearTimers();
     this.currentPreset = null;
@@ -188,10 +175,6 @@ export class TypewriterManager {
     }
   }
 
-  /**
-   * Called when camera reaches the preset target position.
-   * Starts typing out the text with horror jitter and glitch keystrokes.
-   */
   showPreset(presetName) {
     this.clearTimers();
 
@@ -203,21 +186,17 @@ export class TypewriterManager {
 
     this.currentPreset = presetName;
 
-    // Reset container state
     this.container.classList.remove('exiting', 'glitch-hit');
     if (this.container.scrollTop !== undefined) {
       this.container.scrollTop = 0;
     }
 
-    // Set headers
     if (this.badgeEl) this.badgeEl.textContent = data.badge;
     if (this.titleEl) this.titleEl.textContent = data.title;
     if (this.textEl) this.textEl.textContent = '';
 
-    // Activate visible + horror typing jitter state
     this.container.classList.add('visible', 'is-typing');
 
-    // Clean up text: trim leading/trailing newlines and spaces from EVERY line completely
     const fullText = (data.text || '')
       .split('\n')
       .map((line) => line.trim())
@@ -236,12 +215,10 @@ export class TypewriterManager {
         this.textEl.textContent += fullText.charAt(charIndex);
         charIndex++;
 
-        // Auto-scroll as text types if content overflows
         if (this.container.scrollHeight > this.container.clientHeight) {
           this.container.scrollTop = this.container.scrollHeight;
         }
 
-        // Random demonic glitch burst (~12% chance per keystroke)
         if (Math.random() < 0.12) {
           this.container.classList.add('glitch-hit');
           setTimeout(() => {
@@ -251,7 +228,6 @@ export class TypewriterManager {
           }, 40);
         }
       } else {
-        // Typing finished -> remove horror jitter
         this.isTyping = false;
         this.container.classList.remove('is-typing', 'glitch-hit');
         clearInterval(this.timer);

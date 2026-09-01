@@ -7,7 +7,6 @@ export class ParticleSystem {
   constructor(scene) {
     this.scene = scene;
     this.instancedMesh = null;
-    // Mobile optimization: 1800 particles on mobile, 5000 on PC/Desktop
     this.particleCount = isMobile ? 1800 : 5000;
     this.particleData = [];
     this.dummy = new THREE.Object3D();
@@ -31,7 +30,6 @@ export class ParticleSystem {
     });
 
     this.instancedMesh = new THREE.InstancedMesh(baseGeo, material, this.particleCount);
-    // Disable shadow casting for floating ember particles on mobile for high GPU fillrate, keep enabled on PC
     this.instancedMesh.castShadow = !isMobile;
     this.instancedMesh.receiveShadow = false;
 

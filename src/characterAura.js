@@ -1,23 +1,17 @@
 import * as THREE from 'three';
 
-/**
- * USER CONFIGURABLE HORN/WING AURA & BROAD FOG PARAMETERS
- */
 export const RING_CONFIG = {
   ring: {
-    position: [0, 1.30, -0.52],        // [X, Y, Z] Exact user base position on GLB wing root/spine
-    rotation: [-0.25, 0, 0],          // [RotX, RotY, RotZ] Exact user rotation in radians
-    radius: 0.44,                     // Exact user ring radius (0.44m)
-    tube: 0.015,                      // Guide tube thickness
-    color: 0xff0033,                  // Color
+    position: [0, 1.30, -0.52],
+    rotation: [-0.25, 0, 0],
+    radius: 0.44,
+    tube: 0.015,
+    color: 0xff0033,
   },
-  showGuideRing: false,               // Set to true if you want to display the solid guide ring mesh
-  showBroadFog: true,                 // Set to true to enable realistic broad red volumetric fog around character
+  showGuideRing: false,
+  showBroadFog: true,
 };
 
-/**
- * Creates realistic, thin, elongated wispy smoke texture for the wing aura.
- */
 function createWispyDarkBloodSmokeTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
@@ -26,7 +20,6 @@ function createWispyDarkBloodSmokeTexture() {
 
   ctx.clearRect(0, 0, 512, 512);
 
-  // 1. Dark Charcoal Black Outer Shadow Layer
   const blackWisps = [
     { x: 256, y: 260, rx: 140, ry: 200, a: 0.90 },
     { x: 210, y: 210, rx: 100, ry: 160, a: 0.75 },
@@ -49,7 +42,6 @@ function createWispyDarkBloodSmokeTexture() {
     ctx.restore();
   });
 
-  // 2. Deep Dark Blood-Red Core Layer
   const bloodWisps = [
     { x: 256, y: 250, rx: 85, ry: 130, a: 0.90 },
     { x: 225, y: 200, rx: 65, ry: 100, a: 0.80 },
@@ -78,9 +70,6 @@ function createWispyDarkBloodSmokeTexture() {
   return texture;
 }
 
-/**
- * Creates an ultra-soft organic volumetric fog texture for broad scene mist.
- */
 function createBroadFogTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
@@ -92,7 +81,6 @@ function createBroadFogTexture() {
   const cx = 256;
   const cy = 256;
 
-  // Ultra-soft layered radial fog cloud with organic cloud falloff
   const mainGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 250);
   mainGrad.addColorStop(0.0, 'rgba(120, 0, 15, 0.75)');
   mainGrad.addColorStop(0.35, 'rgba(75, 0, 10, 0.45)');
@@ -104,7 +92,6 @@ function createBroadFogTexture() {
   ctx.arc(cx, cy, 250, 0, Math.PI * 2);
   ctx.fill();
 
-  // Add organic fog cloud puffs for realistic volumetric depth
   const cloudPuffs = [
     { x: 190, y: 210, r: 130, a: 0.40 },
     { x: 310, y: 220, r: 140, a: 0.40 },
@@ -130,9 +117,6 @@ function createBroadFogTexture() {
   return texture;
 }
 
-/**
- * Creates a glistening, shiny fire spark texture with an intense white diamond core.
- */
 function createShinyFireSparkTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 128;
@@ -145,10 +129,10 @@ function createShinyFireSparkTexture() {
   const cy = 64;
 
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 64);
-  grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');  // Intense white diamond core
-  grad.addColorStop(0.15, 'rgba(255, 180, 195, 1.0)'); // Glowing inner halo
-  grad.addColorStop(0.4, 'rgba(230, 20, 45, 0.90)');   // Bright blood-red sparkle
-  grad.addColorStop(0.75, 'rgba(140, 0, 15, 0.40)');  // Dark red border
+  grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+  grad.addColorStop(0.15, 'rgba(255, 180, 195, 1.0)');
+  grad.addColorStop(0.4, 'rgba(230, 20, 45, 0.90)');
+  grad.addColorStop(0.75, 'rgba(140, 0, 15, 0.40)');
   grad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
 
   ctx.fillStyle = grad;
@@ -163,10 +147,6 @@ function createShinyFireSparkTexture() {
 
 const isMobile = typeof window !== 'undefined' && (window.innerWidth <= 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
 
-/**
- * BROAD REALISTIC RED VOLUMETRIC FOG SYSTEM
- * Renders large, organic, low-lying and mid-level rolling red mist surrounding the character broadly.
- */
 export class BroadRedFog {
   constructor(scene) {
     this.scene = scene;
@@ -174,7 +154,6 @@ export class BroadRedFog {
     this.scene.add(this.group);
 
     this.texture = createBroadFogTexture();
-    // 35 volumetric fog planes on mobile, 85 on PC/Desktop
     this.fogCount = isMobile ? 35 : 85;
     this.fogParticles = [];
 
@@ -184,13 +163,12 @@ export class BroadRedFog {
   _createBroadFog() {
     const geo = new THREE.PlaneGeometry(1, 1);
 
-    // Deep crimson, dark blood red, and maroon fog color spectrum
     const fogColors = [
-      new THREE.Color(0x7a000e), // Deep blood crimson
-      new THREE.Color(0x570009), // Dark maroon mist
-      new THREE.Color(0x940013), // Rich blood red
-      new THREE.Color(0x380005), // Shadow blood fog
-      new THREE.Color(0x6b000b), // Vampiric crimson
+      new THREE.Color(0x7a000e),
+      new THREE.Color(0x570009),
+      new THREE.Color(0x940013),
+      new THREE.Color(0x380005),
+      new THREE.Color(0x6b000b),
     ];
 
     for (let i = 0; i < this.fogCount; i++) {
@@ -207,14 +185,12 @@ export class BroadRedFog {
 
       const mesh = new THREE.Mesh(geo, mat);
 
-      // Distribute fog broadly across a wide 26-meter diameter region (X: -13 to +13, Z: -13 to +13)
       const x = (Math.random() - 0.5) * 26.0;
       const z = (Math.random() - 0.5) * 26.0;
       const y = 0.05 + Math.random() * 3.4;
 
       mesh.position.set(x, y, z);
 
-      // Enlarged scale for seamless, massive rolling fog banks (7.0m to 14.0m wide)
       const scaleX = 7.0 + Math.random() * 7.0;
       const scaleY = 4.5 + Math.random() * 5.0;
       mesh.scale.set(scaleX, scaleY, 1.0);
@@ -222,12 +198,10 @@ export class BroadRedFog {
 
       this.group.add(mesh);
 
-      // Random wind drift & wave turbulence
       const driftSpeedX = (Math.random() - 0.5) * 0.16;
       const driftSpeedZ = (Math.random() - 0.5) * 0.16;
       const rotSpeed = (Math.random() - 0.5) * 0.04;
 
-      // Slightly thinner opacity envelope (opacity: 0.07 to 0.15)
       const maxOpacity = 0.07 + Math.random() * 0.08;
 
       this.fogParticles.push({
@@ -256,33 +230,27 @@ export class BroadRedFog {
     for (let i = 0; i < this.fogCount; i++) {
       const f = this.fogParticles[i];
 
-      // Slow organic horizontal wind drift
       f.x += f.driftSpeedX * deltaTime;
       f.z += f.driftSpeedZ * deltaTime;
 
-      // Wrap around wide bounds (-13.5 to +13.5 meters)
       if (f.x > 13.5) f.x = -13.5;
       if (f.x < -13.5) f.x = 13.5;
       if (f.z > 13.5) f.z = -13.5;
       if (f.z < -13.5) f.z = 13.5;
 
-      // Organic sine wave vertical float & rotation
       const waveY = Math.sin(elapsedTime * 0.5 + f.wobblePhase) * 0.16;
       const waveX = Math.cos(elapsedTime * 0.35 + f.wobblePhase) * 0.14;
 
       f.mesh.position.set(f.x + waveX, f.y + waveY, f.z);
       f.mesh.rotation.z += f.rotSpeed * deltaTime;
 
-      // Pulsing fog density breathing effect
       const breathe = 0.88 + Math.sin(elapsedTime * 0.7 + f.wobblePhase) * 0.12;
 
-      // Distance falloff near outer 14m boundary to fade seamlessly
       const distFromCenter = Math.sqrt(f.x * f.x + f.z * f.z);
       const edgeFade = Math.max(0, 1.0 - Math.pow(distFromCenter / 14.0, 2));
 
       f.material.opacity = Math.max(0, f.maxOpacity * breathe * edgeFade);
 
-      // Face camera billboard orientation
       if (camera) {
         f.mesh.quaternion.copy(camera.quaternion);
       }
@@ -302,12 +270,10 @@ export class CharacterAura {
     this.scene = scene;
     this.targetPosition = targetPosition.clone();
 
-    // Root Group
     this.group = new THREE.Group();
     this.group.position.copy(this.targetPosition);
     this.scene.add(this.group);
 
-    // Aura Transform Group (Positioned & Rotated according to user RING_CONFIG)
     this.auraGroup = new THREE.Group();
     this.auraGroup.position.set(...RING_CONFIG.ring.position);
     this.auraGroup.rotation.set(...RING_CONFIG.ring.rotation);
@@ -316,17 +282,14 @@ export class CharacterAura {
     this.smokeTexture = createWispyDarkBloodSmokeTexture();
     this.emberTexture = createShinyFireSparkTexture();
 
-    // Broad Red Volumetric Fog System (Kabut Merah Melayap & Surrounding Character)
     this.broadFog = null;
     if (RING_CONFIG.showBroadFog) {
       this.broadFog = new BroadRedFog(scene);
     }
 
-    // 60 wispy smoke plumes on mobile, 320 on PC/Desktop
     this.smokeCount = isMobile ? 60 : 320;
     this.smokeParticles = [];
 
-    // 50 glistening fire spark dots on mobile, 280 on PC/Desktop
     this.emberCount = isMobile ? 50 : 280;
     this.emberGeometry = null;
     this.emberMaterial = null;
@@ -371,24 +334,20 @@ export class CharacterAura {
         this.wingNodes.push(child);
       }
     });
-
-    if (this.wingNodes.length > 0) {
-      console.info(`[CharacterAura] Detected ${this.wingNodes.length} wing node(s) in GLB model.`);
-    }
   }
 
   _createHornWingSmokeSystem() {
     const geo = new THREE.PlaneGeometry(0.20, 0.45);
 
     const colors = [
-      new THREE.Color(0x80000d), // Deep blood red
-      new THREE.Color(0x59000a), // Dark crimson blood
-      new THREE.Color(0x400006), // Dark maroon shadow
-      new THREE.Color(0x990010), // Rich dark blood
-      new THREE.Color(0x2d0004), // Dark shadow blood
+      new THREE.Color(0x80000d),
+      new THREE.Color(0x59000a),
+      new THREE.Color(0x400006),
+      new THREE.Color(0x990010),
+      new THREE.Color(0x2d0004),
     ];
 
-    const R = RING_CONFIG.ring.radius; // 0.44m
+    const R = RING_CONFIG.ring.radius;
 
     for (let i = 0; i < this.smokeCount; i++) {
       const color = colors[i % colors.length];
@@ -524,18 +483,15 @@ export class CharacterAura {
       this._detectWingNodes(model);
     }
 
-    // Sync Broad Volumetric Red Fog
     if (this.broadFog) {
       this.broadFog.update(elapsedTime, deltaTime, camera);
     }
 
-    // Keep auraGroup transform synced to user RING_CONFIG
     if (this.auraGroup) {
       this.auraGroup.position.set(...RING_CONFIG.ring.position);
       this.auraGroup.rotation.set(...RING_CONFIG.ring.rotation);
     }
 
-    // 1. Update Realistic Wispy Smoke Plumes
     for (let i = 0; i < this.smokeCount; i++) {
       const p = this.smokeParticles[i];
 
@@ -579,7 +535,6 @@ export class CharacterAura {
       }
     }
 
-    // 2. Update Glistening Sparkling Fire Embers
     if (this.emberGeometry) {
       const posAttr = this.emberGeometry.getAttribute('position');
       const colorAttr = this.emberGeometry.getAttribute('color');

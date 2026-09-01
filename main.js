@@ -224,7 +224,6 @@ function setupCameraUI() {
     });
   }
 
-  // Deactivate preset buttons & hide typewriter text when user manually orbits/drags the camera
   if (cameraController) {
     cameraController.onUserInteract = () => {
       if (typewriterManager) {
@@ -234,7 +233,6 @@ function setupCameraUI() {
         b.classList.remove('active');
         b.classList.remove('shimmer-trigger');
       });
-      // Optionally re-highlight default if wanted, or leave unselected
       const defaultBtn = document.getElementById('cam-default');
       if (defaultBtn) {
         defaultBtn.classList.add('active');
@@ -255,7 +253,6 @@ function setupCameraUI() {
       void btn.offsetWidth;
       btn.classList.add('shimmer-trigger');
 
-      // Immediately hide typewriter text with fast exit animation when button is pressed
       if (typewriterManager) {
         typewriterManager.hide();
       }
@@ -265,7 +262,6 @@ function setupCameraUI() {
       } else if (camName === 'default') {
         cameraController.goToPreset('default', 2);
       } else {
-        // Switch camera -> once target position is reached, start typewriter animation
         cameraController.goToPreset(camName, 2, () => {
           if (cameraController.currentPreset === camName && typewriterManager) {
             typewriterManager.showPreset(camName);

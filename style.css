@@ -636,17 +636,14 @@ html, body {
 }
 
 @media (max-width: 768px) {
-  /* --- Loader --- */
   .loader-logo-text {
     font-size: 2.5rem;
   }
 
-  /* --- Top bar --- */
   #top-bar {
     padding: 10px 12px;
   }
 
-  /* --- Hint drawer (left side) --- */
   #hint-drawer {
     top: 14px;
   }
@@ -669,20 +666,17 @@ html, body {
     height: 36px;
   }
 
-  /* --- FPS counter --- */
   .fps-counter {
     right: 12px;
     top: 14px;
     font-size: 0.75rem;
   }
 
-  /* --- Music button --- */
   .music-btn {
     top: 14px;
     right: 64px;
   }
 
-  /* --- Camera drawer — top sheet container (pops down from top) --- */
   #camera-drawer {
     right: 0;
     left: 0;
@@ -698,7 +692,6 @@ html, body {
     z-index: 150;
   }
 
-  /* Toggle button handle (attached at bottom of top panel, matches glassmorphism color & border) */
   .cam-toggle-btn {
     order: 2;
     position: relative;
@@ -733,19 +726,18 @@ html, body {
   .cam-toggle-btn .toggle-icon {
     font-size: 0.85rem;
     color: #ffffff;
-    transform: rotate(90deg); /* Arrow points down when collapsed */
+    transform: rotate(90deg);
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   #camera-drawer.collapsed .toggle-icon {
-    transform: rotate(90deg); /* Points down to expand */
+    transform: rotate(90deg);
   }
 
   #camera-drawer:not(.collapsed) .toggle-icon {
-    transform: rotate(-90deg); /* Points up to collapse */
+    transform: rotate(-90deg);
   }
 
-  /* Compact top sheet glass panel */
   .cam-panel {
     order: 1;
     pointer-events: auto;
@@ -774,7 +766,6 @@ html, body {
     border-bottom: none;
   }
 
-  /* Scrollable horizontal pill bar */
   #camera-controls {
     flex-direction: row;
     flex-wrap: nowrap;
@@ -792,7 +783,6 @@ html, body {
     display: none;
   }
 
-  /* Compact buttons */
   .cam-btn {
     min-width: auto;
     flex-shrink: 0;
@@ -857,26 +847,22 @@ html, body {
     font-size: 0.85rem;
   }
 
-  /* --- Anim controls --- */
   #anim-controls {
     left: 12px;
     bottom: 80px;
   }
 
-  /* --- Credit badge --- */
   #credit-badge {
     font-size: 0.6rem;
     padding: 4px 10px;
     bottom: 0;
   }
 
-  /* --- General hint --- */
   .hint {
     font-size: 0.6rem;
   }
 }
 
-/* Extra small screens (< 400px) */
 @media (max-width: 400px) {
   .hint-text {
     max-width: 160px;
@@ -947,10 +933,6 @@ html, body {
   opacity: 0.72;
   white-space: nowrap;
 }
-
-/* ==========================================================================
-   TRANSPARENT TYPEWRITER CONTAINER
-   ========================================================================== */
 
 .typewriter-container {
   position: fixed;
@@ -1048,21 +1030,14 @@ html, body {
   text-shadow: 0 0 6px rgba(107, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.95);
 }
 
-/* ==========================================================================
-   HORROR TYPING ANIMATIONS (ULTRA-SUBTLE TREMOR)
-   ========================================================================== */
-
-/* Ultra subtle creepy tremor while typing */
 .typewriter-container.is-typing {
   animation: horrorJitter 0.2s infinite alternate ease-in-out;
 }
 
-/* Demonic keystroke micro-shift */
 .typewriter-container.glitch-hit {
   transform: translate(-1px, 0px) !important;
 }
 
-/* Keyframes: Ultra Subtle Horror Tremor */
 @keyframes horrorJitter {
   0% { transform: translate(0, 0); }
   50% { transform: translate(0.4px, -0.3px); }
@@ -1092,10 +1067,6 @@ html, body {
     font-size: 0.84rem;
   }
 }
-
-/* ==========================================================================
-   TOUCH WARNING OVERLAY ("DONT" -> "TOUCH" -> "ANYTHING!!!")
-   ========================================================================== */
 
 .touch-warning-overlay {
   position: fixed;
