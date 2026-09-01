@@ -40,6 +40,7 @@ export class CameraController {
     this.autoOrbitHeight = 2.4;
     this.isTransitioning = false;
     this.currentPreset = 'default';
+    this.onUserInteract = null;
 
     this.controls = new OrbitControls(camera, canvas);
     this.controls.enableDamping = true;
@@ -50,11 +51,22 @@ export class CameraController {
     this.controls.maxPolarAngle = Math.PI * 0.85;
     this.controls.target.copy(CAMERA_PRESETS.default.target);
 
+    this.controls.addEventListener('start', () => {
+      if (!this.isTransitioning) {
+        this.stopAutoOrbit();
+        this.currentPreset = 'custom';
+        if (typeof this.onUserInteract === 'function') {
+          this.onUserInteract();
+        }
+      }
+    });
+
     this.camera.position.copy(CAMERA_PRESETS.default.position);
     this.controls.update();
   }
 
-  goToPreset(presetName, duration = 2) {
+
+  goToPreset(presetName, duration = 2, onCompleteCB = null) {
     const preset = CAMERA_PRESETS[presetName];
     if (!preset) return;
 
@@ -79,6 +91,9 @@ export class CameraController {
         this.controls.enabled = true;
         this.controls.update();
         this.isTransitioning = false;
+        if (typeof onCompleteCB === 'function') {
+          onCompleteCB();
+        }
       },
     });
 

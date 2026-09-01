@@ -7,6 +7,20 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
  * Focuses exclusively on tree1.glb, instancing it massively (85+ instances)
  * across the full view distance as far as the eye can see.
  */
+/**
+ * Simple Mulberry32 seeded PRNG
+ * Produces deterministic random numbers to ensure trees are fixed in exact hardcoded positions on every refresh.
+ */
+function createSeededRandom(seed = 4289571) {
+  let s = seed;
+  return function () {
+    let t = (s += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 export class HorrorForestSystem {
   constructor(scene) {
     this.scene = scene;
@@ -78,12 +92,14 @@ export class HorrorForestSystem {
   }
 
   _scatterTree1Instances(baseModel, count) {
+    const rng = createSeededRandom(4289571);
+
     for (let i = 0; i < count; i++) {
       const clone = baseModel.clone(true);
 
-      // Random position across full view distance (minRadius: 4.5m away from character, maxRadius: 42.0m)
-      const radius = 4.5 + Math.random() * 37.5;
-      const angle = Math.random() * Math.PI * 2;
+      // Deterministic position across full view distance (minRadius: 4.5m, maxRadius: 42.0m)
+      const radius = 4.5 + rng() * 37.5;
+      const angle = rng() * Math.PI * 2;
 
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
@@ -91,11 +107,11 @@ export class HorrorForestSystem {
 
       clone.position.set(x, y, z);
 
-      // Random Y-axis rotation so trees look distinct & organic
-      clone.rotation.y = Math.random() * Math.PI * 2;
+      // Deterministic Y-axis rotation so trees look distinct & organic
+      clone.rotation.y = rng() * Math.PI * 2;
 
-      // Random scale variation for natural forest density (0.75x to 1.45x)
-      const scaleVar = 0.75 + Math.random() * 0.70;
+      // Deterministic scale variation (0.75x to 1.45x)
+      const scaleVar = 0.75 + rng() * 0.70;
       clone.scale.multiplyScalar(scaleVar);
 
       this.forestGroup.add(clone);
@@ -103,6 +119,8 @@ export class HorrorForestSystem {
   }
 
   _generateProceduralHorrorForest(count) {
+    const rng = createSeededRandom(4289571);
+
     // Single organic horror tree geometry pattern representing tree 1
     const treeGeo = this._createTree1Geo();
 
@@ -134,19 +152,19 @@ export class HorrorForestSystem {
         group.add(foliageMesh);
       }
 
-      // Random scatter position across full view distance (4.5m to 42.0m)
-      const radius = 4.5 + Math.random() * 37.5;
-      const angle = Math.random() * Math.PI * 2;
+      // Deterministic scatter position across full view distance (4.5m to 42.0m)
+      const radius = 4.5 + rng() * 37.5;
+      const angle = rng() * Math.PI * 2;
 
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
       const y = 0;
 
       group.position.set(x, y, z);
-      group.rotation.y = Math.random() * Math.PI * 2;
+      group.rotation.y = rng() * Math.PI * 2;
 
-      const scaleVar = 0.75 + Math.random() * 0.70;
-      group.scale.set(scaleVar, scaleVar * (0.9 + Math.random() * 0.3), scaleVar);
+      const scaleVar = 0.75 + rng() * 0.70;
+      group.scale.set(scaleVar, scaleVar * (0.9 + rng() * 0.3), scaleVar);
 
       this.forestGroup.add(group);
     }

@@ -30,6 +30,10 @@
   --font-display: 'Space Grotesk', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
+  --font-horror-title: 'Creepster', cursive, sans-serif;
+  --font-horror-drip: 'Nosifer', cursive, sans-serif;
+  --font-horror-body: 'Special Elite', cursive, monospace;
+
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-cinematic: 0.8s cubic-bezier(0.22, 1, 0.36, 1);
@@ -52,6 +56,11 @@ html, body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 #three-canvas {
@@ -689,8 +698,9 @@ html, body {
     z-index: 150;
   }
 
-  /* Toggle button handle (attached at bottom of top panel) */
+  /* Toggle button handle (attached at bottom of top panel, matches glassmorphism color & border) */
   .cam-toggle-btn {
+    order: 2;
     position: relative;
     pointer-events: auto;
     left: auto;
@@ -698,18 +708,21 @@ html, body {
     top: auto;
     bottom: auto;
     flex-shrink: 0;
-    width: 64px;
-    height: 28px;
-    border-radius: 0 0 14px 14px;
+    width: 58px;
+    height: 24px;
+    border-radius: 0 0 12px 12px;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: none;
-    box-shadow: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
     z-index: 200;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: -1px;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease;
   }
 
   .cam-toggle-btn:hover {
@@ -718,7 +731,7 @@ html, body {
   }
 
   .cam-toggle-btn .toggle-icon {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: #ffffff;
     transform: rotate(90deg); /* Arrow points down when collapsed */
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -732,19 +745,21 @@ html, body {
     transform: rotate(-90deg); /* Points up to collapse */
   }
 
-  /* Top sheet glass panel */
+  /* Compact top sheet glass panel */
   .cam-panel {
+    order: 1;
     pointer-events: auto;
     width: 100%;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
     border: none;
-    box-shadow: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
     border-radius: 0;
     overflow: hidden;
-    max-height: 180px;
-    padding: 12px 0 14px 0;
+    max-height: 56px;
+    padding: 6px 0 6px 0;
     transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
                 padding 0.4s cubic-bezier(0.16, 1, 0.3, 1),
                 opacity 0.3s ease;
@@ -756,6 +771,7 @@ html, body {
     padding-bottom: 0;
     opacity: 0;
     pointer-events: none;
+    border-bottom: none;
   }
 
   /* Scrollable horizontal pill bar */
@@ -764,8 +780,8 @@ html, body {
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    gap: 10px;
-    padding: 2px 16px;
+    gap: 8px;
+    padding: 2px 14px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
@@ -776,15 +792,15 @@ html, body {
     display: none;
   }
 
-  /* Spacious buttons with transparent background matching panel */
+  /* Compact buttons */
   .cam-btn {
     min-width: auto;
     flex-shrink: 0;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    font-size: 0.78rem;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
     font-weight: 500;
     border-radius: 0;
     background: transparent;
@@ -792,7 +808,7 @@ html, body {
     color: var(--text-secondary);
     scroll-snap-align: center;
     transition: color 0.25s ease, opacity 0.25s ease;
-    min-height: 38px;
+    min-height: 32px;
   }
 
   .cam-btn:hover {
@@ -931,3 +947,258 @@ html, body {
   opacity: 0.72;
   white-space: nowrap;
 }
+
+/* ==========================================================================
+   TRANSPARENT TYPEWRITER CONTAINER
+   ========================================================================== */
+
+.typewriter-container {
+  position: fixed;
+  top: 80px;
+  left: 36px;
+  max-width: 780px;
+  max-height: calc(100vh - 130px);
+  overflow-y: auto;
+  z-index: 90;
+  pointer-events: auto;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-right: 6px;
+}
+
+.typewriter-container::-webkit-scrollbar {
+  width: 3px;
+}
+
+.typewriter-container::-webkit-scrollbar-thumb {
+  background: rgba(122, 8, 26, 0.4);
+  border-radius: 4px;
+}
+
+.typewriter-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.typewriter-container.exiting {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.typewriter-badge {
+  display: inline-block;
+  font-family: var(--font-horror-body), 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6b0012;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}
+
+.typewriter-title {
+  font-family: var(--font-horror-title), cursive, sans-serif;
+  font-size: 1.55rem;
+  font-weight: 400;
+  color: #7a081a;
+  margin: 0 0 2px 0;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  text-shadow: 0 0 6px rgba(100, 0, 15, 0.35), 0 2px 10px rgba(0, 0, 0, 0.98);
+}
+
+.typewriter-body {
+  font-family: var(--font-horror-body), 'Special Elite', monospace;
+  font-size: 0.84rem;
+  line-height: 1.42;
+  color: #941026;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 5px rgba(100, 0, 15, 0.25), 0 2px 8px rgba(0, 0, 0, 0.98);
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+  text-align: left;
+}
+
+#typewriter-text {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+  white-space: pre-wrap;
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  font-family: var(--font-horror-title), sans-serif;
+  color: #6b0000;
+  font-weight: 800;
+  font-size: 1.3rem;
+  margin-left: 3px;
+  animation: cursorBlink 0.8s infinite;
+  text-shadow: 0 0 6px rgba(107, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.95);
+}
+
+/* ==========================================================================
+   HORROR TYPING ANIMATIONS (ULTRA-SUBTLE TREMOR)
+   ========================================================================== */
+
+/* Ultra subtle creepy tremor while typing */
+.typewriter-container.is-typing {
+  animation: horrorJitter 0.2s infinite alternate ease-in-out;
+}
+
+/* Demonic keystroke micro-shift */
+.typewriter-container.glitch-hit {
+  transform: translate(-1px, 0px) !important;
+}
+
+/* Keyframes: Ultra Subtle Horror Tremor */
+@keyframes horrorJitter {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(0.4px, -0.3px); }
+  100% { transform: translate(-0.3px, 0.3px); }
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .typewriter-container {
+    top: 75px;
+    left: 20px;
+    right: 20px;
+    max-width: calc(100vw - 40px);
+  }
+
+  .typewriter-title {
+    font-size: 1.25rem;
+  }
+
+  .typewriter-body {
+    font-size: 0.84rem;
+  }
+}
+
+/* ==========================================================================
+   TOUCH WARNING OVERLAY ("DONT" -> "TOUCH" -> "ANYTHING!!!")
+   ========================================================================== */
+
+.touch-warning-overlay {
+  position: fixed;
+  z-index: 999;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.touch-warning-overlay.visible {
+  opacity: 1;
+}
+
+.touch-warning-word {
+  font-family: var(--font-display), 'Space Grotesk', 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 1.65rem;
+  color: #7a081a;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 10px rgba(122, 8, 26, 0.7), 0 2px 8px rgba(0, 0, 0, 0.95);
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0.8) translateY(6px);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.touch-warning-word.show {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  animation: warningJitter 0.12s infinite alternate ease-in-out;
+}
+
+.touch-warning-word.emphasis {
+  color: #8b0000;
+  font-size: 1.85rem;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 14px rgba(139, 0, 0, 0.9), 0 2px 10px rgba(0, 0, 0, 0.98);
+}
+
+@keyframes warningJitter {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-1.5px, 1px) rotate(-0.5deg); }
+  66% { transform: translate(1.5px, -1px) rotate(0.5deg); }
+  100% { transform: translate(-1px, -0.5px) rotate(-0.3deg); }
+}
+
+/* ==========================================================================
+   UNDERNEATH CAMERA ANGLE WARNING ("WHAT ARE YOU DOING?")
+   ========================================================================== */
+
+.underneath-warning-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.underneath-warning-overlay.visible {
+  opacity: 1;
+}
+
+.underneath-word {
+  font-family: var(--font-display), 'Space Grotesk', 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 2.1rem;
+  color: #8b0000;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 16px rgba(139, 0, 0, 0.95), 0 2px 12px rgba(0, 0, 0, 0.98);
+  animation: warningJitter 0.1s infinite alternate ease-in-out;
+  display: inline-block;
+}
+
+.underneath-word.question {
+  color: #a80c25;
+  font-size: 2.4rem;
+}
+
+@media (max-width: 768px) {
+  .touch-warning-word {
+    font-size: 1.25rem;
+  }
+  .touch-warning-word.emphasis {
+    font-size: 1.4rem;
+  }
+  .underneath-word {
+    font-size: 1.3rem;
+  }
+  .underneath-word.question {
+    font-size: 1.5rem;
+  }
+}
+
+
+
+

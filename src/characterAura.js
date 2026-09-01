@@ -5,7 +5,7 @@ import * as THREE from 'three';
  */
 export const RING_CONFIG = {
   ring: {
-    position: [0, 1.4, -0.62],        // [X, Y, Z] Exact user base position on GLB wing root/spine
+    position: [0, 1.30, -0.52],        // [X, Y, Z] Exact user base position on GLB wing root/spine
     rotation: [-0.25, 0, 0],          // [RotX, RotY, RotZ] Exact user rotation in radians
     radius: 0.44,                     // Exact user ring radius (0.44m)
     tube: 0.015,                      // Guide tube thickness
@@ -31,7 +31,7 @@ function createWispyDarkBloodSmokeTexture() {
     { x: 256, y: 260, rx: 140, ry: 200, a: 0.90 },
     { x: 210, y: 210, rx: 100, ry: 160, a: 0.75 },
     { x: 302, y: 200, rx: 110, ry: 170, a: 0.75 },
-    { x: 256, y: 140, rx: 90,  ry: 130, a: 0.65 },
+    { x: 256, y: 140, rx: 90, ry: 130, a: 0.65 },
   ];
 
   blackWisps.forEach(({ x, y, rx, ry, a }) => {
@@ -54,7 +54,7 @@ function createWispyDarkBloodSmokeTexture() {
     { x: 256, y: 250, rx: 85, ry: 130, a: 0.90 },
     { x: 225, y: 200, rx: 65, ry: 100, a: 0.80 },
     { x: 287, y: 190, rx: 70, ry: 105, a: 0.80 },
-    { x: 256, y: 140, rx: 50, ry: 80,  a: 0.65 },
+    { x: 256, y: 140, rx: 50, ry: 80, a: 0.65 },
   ];
 
   bloodWisps.forEach(({ x, y, rx, ry, a }) => {
@@ -161,6 +161,8 @@ function createShinyFireSparkTexture() {
   return texture;
 }
 
+const isMobile = typeof window !== 'undefined' && (window.innerWidth <= 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+
 /**
  * BROAD REALISTIC RED VOLUMETRIC FOG SYSTEM
  * Renders large, organic, low-lying and mid-level rolling red mist surrounding the character broadly.
@@ -172,7 +174,8 @@ export class BroadRedFog {
     this.scene.add(this.group);
 
     this.texture = createBroadFogTexture();
-    this.fogCount = 85; // 85 large volumetric fog planes for wide coverage
+    // 35 volumetric fog planes on mobile, 85 on PC/Desktop
+    this.fogCount = isMobile ? 35 : 85;
     this.fogParticles = [];
 
     this._createBroadFog();
@@ -319,12 +322,12 @@ export class CharacterAura {
       this.broadFog = new BroadRedFog(scene);
     }
 
-    // 160 thin wispy smoke plumes
-    this.smokeCount = 160;
+    // 60 wispy smoke plumes on mobile, 320 on PC/Desktop
+    this.smokeCount = isMobile ? 60 : 320;
     this.smokeParticles = [];
 
-    // 130 shiny glistening fire spark dots
-    this.emberCount = 130;
+    // 50 glistening fire spark dots on mobile, 280 on PC/Desktop
+    this.emberCount = isMobile ? 50 : 280;
     this.emberGeometry = null;
     this.emberMaterial = null;
     this.emberPoints = null;
@@ -484,6 +487,7 @@ export class CharacterAura {
         baseX: lx,
         baseY: ly,
         baseZ: lz,
+        baseColor: color.clone(),
         x: lx,
         y: ly,
         z: lz,
@@ -536,17 +540,21 @@ export class CharacterAura {
       const p = this.smokeParticles[i];
 
       p.life += deltaTime * 0.38;
-
-      p.y += p.upSpeed * deltaTime;
-      p.x += p.driftX * deltaTime;
-      p.z += p.driftZ * deltaTime;
+      if (p.life >= 1.0) {
+        p.life %= 1.0;
+      }
 
       const progress = p.life;
+      const lifetime = 1.0 / 0.38;
+
+      const curX = p.baseX + p.driftX * lifetime * progress;
+      const curY = p.baseY + p.upSpeed * lifetime * progress;
+      const curZ = p.baseZ + p.driftZ * lifetime * progress;
 
       p.mesh.position.set(
-        p.x + Math.sin(elapsedTime * 1.8 + i) * 0.015,
-        p.y,
-        p.z
+        curX + Math.sin(elapsedTime * 1.8 + i) * 0.015,
+        curY,
+        curZ
       );
 
       p.mesh.rotation.z += p.rotSpeed * deltaTime;
@@ -556,12 +564,12 @@ export class CharacterAura {
       p.mesh.scale.set(currentScaleX, currentScaleY, 1.0);
 
       let opacity = 0;
-      if (progress < 0.2) {
-        opacity = (progress / 0.2) * p.maxOpacity;
-      } else if (progress < 0.75) {
+      if (progress < 0.25) {
+        opacity = (progress / 0.25) * p.maxOpacity;
+      } else if (progress < 0.70) {
         opacity = p.maxOpacity;
-      } else if (progress <= 1.0) {
-        opacity = (1.0 - (progress - 0.75) / 0.25) * p.maxOpacity;
+      } else {
+        opacity = Math.max(0, (1.0 - progress) / 0.30) * p.maxOpacity;
       }
 
       p.material.opacity = Math.max(0, opacity);
@@ -569,41 +577,49 @@ export class CharacterAura {
       if (camera) {
         p.mesh.quaternion.copy(camera.quaternion);
       }
-
-      if (progress >= 1.0) {
-        p.life = 0;
-        p.x = p.baseX;
-        p.y = p.baseY;
-        p.z = p.baseZ;
-      }
     }
 
     // 2. Update Glistening Sparkling Fire Embers
     if (this.emberGeometry) {
       const posAttr = this.emberGeometry.getAttribute('position');
+      const colorAttr = this.emberGeometry.getAttribute('color');
       const positions = posAttr.array;
+      const colors = colorAttr.array;
 
       for (let i = 0; i < this.emberCount; i++) {
         const e = this.emberData[i];
         e.life += deltaTime * 0.55;
-
-        e.y += e.vy * deltaTime;
-        e.x += e.vx * deltaTime;
-        e.z += e.vz * deltaTime;
-
-        positions[i * 3 + 0] = e.x + Math.sin(elapsedTime * 3.0 + i) * 0.012;
-        positions[i * 3 + 1] = e.y;
-        positions[i * 3 + 2] = e.z;
-
         if (e.life >= 1.0) {
-          e.life = 0;
-          e.x = e.baseX;
-          e.y = e.baseY;
-          e.z = e.baseZ;
+          e.life %= 1.0;
         }
+
+        const progress = e.life;
+        const lifetime = 1.0 / 0.55;
+
+        const curX = e.baseX + e.vx * lifetime * progress;
+        const curY = e.baseY + e.vy * lifetime * progress;
+        const curZ = e.baseZ + e.vz * lifetime * progress;
+
+        positions[i * 3 + 0] = curX + Math.sin(elapsedTime * 3.0 + i) * 0.012;
+        positions[i * 3 + 1] = curY;
+        positions[i * 3 + 2] = curZ;
+
+        let fade = 0;
+        if (progress < 0.20) {
+          fade = progress / 0.20;
+        } else if (progress < 0.75) {
+          fade = 1.0;
+        } else {
+          fade = Math.max(0, (1.0 - progress) / 0.25);
+        }
+
+        colors[i * 3 + 0] = e.baseColor.r * fade;
+        colors[i * 3 + 1] = e.baseColor.g * fade;
+        colors[i * 3 + 2] = e.baseColor.b * fade;
       }
 
       posAttr.needsUpdate = true;
+      if (colorAttr) colorAttr.needsUpdate = true;
     }
   }
 

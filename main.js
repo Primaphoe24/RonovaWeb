@@ -4,7 +4,10 @@ import { ModelLoader } from './src/modelLoader.js';
 import { CameraController } from './src/cameraController.js';
 import { ParticleSystem } from './src/particles.js';
 import { PostProcessingPipeline } from './src/postProcessing.js';
-import { HorrorForestSystem } from './src/forestLoader.js';
+import { TypewriterManager } from './src/typewriterManager.js';
+import { CharacterTouchHandler } from './src/touch3DText.js';
+
+const isMobileDevice = typeof window !== 'undefined' && (window.innerWidth <= 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
 
 const CONFIG = {
   models: {
@@ -19,14 +22,14 @@ const CONFIG = {
     },
   },
   renderer: {
-    pixelRatio: Math.min(window.devicePixelRatio, 2),
+    pixelRatio: Math.min(window.devicePixelRatio, isMobileDevice ? 1.5 : 2.0),
     antialias: false,
     toneMapping: THREE.ACESFilmicToneMapping,
     toneMappingExposure: 1.1,
   },
 };
 
-let renderer, camera, cameraController;
+let renderer, camera, cameraController, typewriterManager, characterTouchHandler;
 let sceneData, modelLoader, particles, postProcessing;
 let clock, elapsedTime = 0;
 let frameCount = 0, fpsTime = 0;
@@ -72,12 +75,16 @@ async function init() {
 
   postProcessing = new PostProcessingPipeline(renderer, scene, camera);
 
-  const forestSystem = new HorrorForestSystem(scene);
-  forestSystem.loadForest();
-
   updateLoading(75);
 
   modelLoader = new ModelLoader(scene);
+
+  characterTouchHandler = new CharacterTouchHandler(
+    scene,
+    camera,
+    canvas,
+    () => modelLoader.model || window.__characterSlot
+  );
 
   try {
     await modelLoader.load(
@@ -112,6 +119,7 @@ async function init() {
   }, 600);
 
   window.addEventListener('resize', onResize);
+  document.addEventListener('selectstart', (e) => e.preventDefault());
 
   clock = new THREE.Clock();
   animate();
@@ -196,6 +204,7 @@ function createCharacterSlot(scene) {
 }
 
 function setupCameraUI() {
+  typewriterManager = new TypewriterManager();
   const buttons = document.querySelectorAll('.cam-btn');
   const drawer = document.getElementById('camera-drawer');
   const toggleBtn = document.getElementById('cam-toggle-btn');
@@ -215,6 +224,24 @@ function setupCameraUI() {
     });
   }
 
+  // Deactivate preset buttons & hide typewriter text when user manually orbits/drags the camera
+  if (cameraController) {
+    cameraController.onUserInteract = () => {
+      if (typewriterManager) {
+        typewriterManager.hide();
+      }
+      buttons.forEach((b) => {
+        b.classList.remove('active');
+        b.classList.remove('shimmer-trigger');
+      });
+      // Optionally re-highlight default if wanted, or leave unselected
+      const defaultBtn = document.getElementById('cam-default');
+      if (defaultBtn) {
+        defaultBtn.classList.add('active');
+      }
+    };
+  }
+
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const camName = btn.dataset.cam;
@@ -228,10 +255,22 @@ function setupCameraUI() {
       void btn.offsetWidth;
       btn.classList.add('shimmer-trigger');
 
+      // Immediately hide typewriter text with fast exit animation when button is pressed
+      if (typewriterManager) {
+        typewriterManager.hide();
+      }
+
       if (camName === 'orbit') {
         cameraController.startAutoOrbit();
+      } else if (camName === 'default') {
+        cameraController.goToPreset('default', 2);
       } else {
-        cameraController.goToPreset(camName);
+        // Switch camera -> once target position is reached, start typewriter animation
+        cameraController.goToPreset(camName, 2, () => {
+          if (cameraController.currentPreset === camName && typewriterManager) {
+            typewriterManager.showPreset(camName);
+          }
+        });
       }
     });
   });
@@ -282,6 +321,10 @@ function animate() {
   cameraController.update(deltaTime);
   modelLoader.update();
   particles.update(elapsedTime, deltaTime, camera, modelLoader ? modelLoader.model : null);
+
+  if (characterTouchHandler) {
+    characterTouchHandler.update(cameraController);
+  }
 
   if (window.__characterSlot) {
     const opacity = 0.25 + Math.sin(elapsedTime * 2) * 0.15;
