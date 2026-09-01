@@ -203,14 +203,14 @@ html, body {
 }
 
 .hint-panel {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(14, 14, 22, 0.88);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
   border-radius: 0;
   height: 40px;
   padding: 0 18px;
-  border: none;
-  box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
 }
@@ -233,17 +233,17 @@ html, body {
   width: 35px;
   height: 40px;
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(14, 14, 22, 0.88);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
   font-family: var(--font-main);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.4);
   transition: background 0.25s ease;
   z-index: 101;
 }
@@ -366,17 +366,17 @@ html, body {
   width: 35px;
   height: 52px;
   border-radius: 18px 0 0 18px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(14, 14, 22, 0.88);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
   font-family: var(--font-main);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.4);
   transition: background 0.25s ease, transform 0.2s ease;
   z-index: 101;
 }
@@ -419,13 +419,13 @@ html, body {
 }
 
 .cam-panel {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(14, 14, 22, 0.88);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0;
   padding: 18px 20px;
-  box-shadow: -8px 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: -8px 8px 30px rgba(0, 0, 0, 0.5);
 }
 
 #camera-controls {
@@ -711,12 +711,12 @@ html, body {
     width: 58px;
     height: 24px;
     border-radius: 0 0 12px 12px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(12, 12, 18, 0.95);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-top: none;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
     z-index: 200;
     display: flex;
     align-items: center;
@@ -750,12 +750,12 @@ html, body {
     order: 1;
     pointer-events: auto;
     width: 100%;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(12, 12, 18, 0.95);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
     border: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     border-radius: 0;
     overflow: hidden;
     max-height: 56px;
@@ -1075,10 +1075,12 @@ html, body {
 
 @media (max-width: 768px) {
   .typewriter-container {
-    top: 75px;
-    left: 20px;
-    right: 20px;
-    max-width: calc(100vw - 40px);
+    top: 70px;
+    left: 16px;
+    right: 16px;
+    bottom: 38px;
+    max-width: calc(100vw - 32px);
+    max-height: none;
   }
 
   .typewriter-title {
