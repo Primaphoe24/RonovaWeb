@@ -7,20 +7,12 @@ export class ModelLoader {
     this.scene = scene;
     this.mixer = null;
     this.animations = [];
+    this.actions = [];
     this.model = null;
     this.clock = new THREE.Clock();
 
-    this.startTime = 1.0;
-    this.endTime = 0;
-    this.loopBlendDuration = 0.35;
     this.timeScale = 1.0;
     this.isPaused = false;
-
-    this.actionA = null;
-    this.actionB = null;
-    this.activeAction = null;
-    this.inactiveAction = null;
-    this.isCrossfading = false;
 
     this.loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
@@ -29,10 +21,6 @@ export class ModelLoader {
   }
 
   async load(path, options = {}, onProgress = null) {
-    if (options.startTime !== undefined) this.startTime = options.startTime;
-    if (options.endTime !== undefined) this.endTime = options.endTime;
-    if (options.loopBlendDuration !== undefined) this.loopBlendDuration = options.loopBlendDuration;
-
     return new Promise((resolve, reject) => {
       this.loader.load(
         path,
@@ -70,7 +58,7 @@ export class ModelLoader {
           if (gltf.animations && gltf.animations.length > 0) {
             this.mixer = new THREE.AnimationMixer(model);
             this.animations = gltf.animations;
-            this.playAnimation(0, 0.5, this.startTime, this.endTime, this.loopBlendDuration);
+            this.playAllAnimations();
           }
 
           this.model = model;
@@ -96,60 +84,43 @@ export class ModelLoader {
     });
   }
 
-  playAnimation(index = 0, fadeTime = 0.5, startTime = this.startTime, endTime = this.endTime, loopBlendDuration = this.loopBlendDuration) {
-    if (!this.mixer || index >= this.animations.length) return;
+  playAllAnimations() {
+    if (!this.mixer || !this.animations || this.animations.length === 0) return;
 
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.loopBlendDuration = loopBlendDuration;
-
-    const mainClip = this.animations[index];
-    const cloneClip = mainClip.clone();
-    cloneClip.name = mainClip.name + '_loop_clone';
-
-    this.actionA = this.mixer.clipAction(mainClip);
-    this.actionB = this.mixer.clipAction(cloneClip);
-
-    this.actionA.setLoop(THREE.LoopRepeat, Infinity);
-    this.actionB.setLoop(THREE.LoopRepeat, Infinity);
-    this.actionA.timeScale = this.timeScale;
-    this.actionB.timeScale = this.timeScale;
-
-    if (this.activeAction) {
-      this.activeAction.fadeOut(fadeTime);
-    }
-
-    this.activeAction = this.actionA;
-    this.inactiveAction = this.actionB;
-
-    this.activeAction.reset();
-    this.activeAction.time = this.startTime;
-    this.activeAction.fadeIn(fadeTime).play();
-
-    this.mixer.update(0.001);
-    this.isCrossfading = false;
+    this.actions = [];
+    this.animations.forEach((clip) => {
+      const action = this.mixer.clipAction(clip);
+      action.setLoop(THREE.LoopRepeat, Infinity);
+      action.timeScale = this.timeScale;
+      action.reset().play();
+      this.actions.push(action);
+    });
   }
 
-  setAnimationRange(start, end, blendDuration = this.loopBlendDuration) {
-    this.startTime = Math.max(0, start);
-    this.endTime = Math.max(0, end);
-    this.loopBlendDuration = Math.max(0, blendDuration);
+  playAnimation(index = null) {
+    if (index === null || index === undefined) {
+      this.playAllAnimations();
+      return;
+    }
+    if (!this.mixer || index >= this.animations.length) return;
 
-    if (this.activeAction) {
-      const clipDuration = this.activeAction.getClip().duration;
-      const effectiveEnd = (this.endTime > 0 && this.endTime < clipDuration) ? this.endTime : clipDuration;
-
-      if (this.activeAction.time < this.startTime || this.activeAction.time >= effectiveEnd) {
-        this.activeAction.time = this.startTime;
-        if (this.mixer) this.mixer.update(0);
-      }
+    const clip = this.animations[index];
+    const action = this.mixer.clipAction(clip);
+    action.setLoop(THREE.LoopRepeat, Infinity);
+    action.timeScale = this.timeScale;
+    action.reset().play();
+    if (!this.actions.includes(action)) {
+      this.actions.push(action);
     }
   }
 
   setSpeed(speed) {
     this.timeScale = speed;
-    if (this.actionA) this.actionA.timeScale = speed;
-    if (this.actionB) this.actionB.timeScale = speed;
+    if (this.actions) {
+      this.actions.forEach((action) => {
+        action.timeScale = speed;
+      });
+    }
   }
 
   togglePause() {
@@ -158,10 +129,10 @@ export class ModelLoader {
   }
 
   getAnimationTimeInfo() {
-    if (!this.activeAction) return { time: 0, duration: 0 };
+    if (!this.actions || this.actions.length === 0) return { time: 0, duration: 0 };
     return {
-      time: this.activeAction.time,
-      duration: this.activeAction.getClip().duration,
+      time: this.actions[0].time,
+      duration: this.actions[0].getClip().duration,
     };
   }
 
@@ -170,50 +141,10 @@ export class ModelLoader {
   }
 
   update() {
-    if (!this.mixer || this.isPaused || !this.activeAction) return;
+    if (!this.mixer || this.isPaused) return;
 
     const delta = this.clock.getDelta();
     this.mixer.update(delta);
-
-    const clipDuration = this.activeAction.getClip().duration;
-    const effectiveEnd = (this.endTime > 0 && this.endTime < clipDuration)
-      ? this.endTime
-      : clipDuration;
-
-    const totalRange = effectiveEnd - this.startTime;
-    const blendDur = Math.min(this.loopBlendDuration, totalRange * 0.45);
-
-    if (totalRange > 0 && blendDur > 0.05) {
-      const timeRemaining = effectiveEnd - this.activeAction.time;
-
-      if (timeRemaining <= blendDur && !this.isCrossfading && this.activeAction.time >= this.startTime) {
-        this.isCrossfading = true;
-
-        this.inactiveAction.reset();
-        this.inactiveAction.timeScale = this.timeScale;
-        this.inactiveAction.time = this.startTime;
-        this.inactiveAction.enabled = true;
-        this.inactiveAction.setEffectiveWeight(1.0);
-        this.inactiveAction.setEffectiveTimeScale(1.0);
-
-        this.inactiveAction.crossFadeFrom(this.activeAction, blendDur, false);
-        this.inactiveAction.play();
-
-        const temp = this.activeAction;
-        this.activeAction = this.inactiveAction;
-        this.inactiveAction = temp;
-      }
-
-      if (this.isCrossfading && (effectiveEnd - this.inactiveAction.time <= 0 || this.activeAction.time > this.startTime + blendDur)) {
-        this.isCrossfading = false;
-        this.inactiveAction.stop();
-      }
-    } else if (totalRange > 0) {
-      if (this.activeAction.time >= effectiveEnd || this.activeAction.time < this.startTime) {
-        this.activeAction.time = this.startTime;
-        this.mixer.update(0);
-      }
-    }
   }
 
   dispose() {
@@ -230,5 +161,6 @@ export class ModelLoader {
     if (this.mixer) {
       this.mixer.stopAllAction();
     }
+    this.actions = [];
   }
 }
