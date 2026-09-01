@@ -213,6 +213,7 @@ html, body {
   box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
+  pointer-events: auto;
 }
 
 .hint-text {
@@ -246,6 +247,7 @@ html, body {
   box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.4);
   transition: background 0.25s ease;
   z-index: 101;
+  pointer-events: auto;
 }
 
 .hint-toggle-btn:hover {
@@ -379,6 +381,7 @@ html, body {
   box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.4);
   transition: background 0.25s ease, transform 0.2s ease;
   z-index: 101;
+  pointer-events: auto;
 }
 
 .cam-toggle-btn:hover {
@@ -426,6 +429,7 @@ html, body {
   border-radius: 0;
   padding: 18px 20px;
   box-shadow: -8px 8px 30px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
 }
 
 #camera-controls {
