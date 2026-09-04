@@ -16,9 +16,11 @@ const CONFIG = {
       position: [0, 0.15, 0],
       scale: 1,
       rotation: [0, 0, 0],
-      startTime: 1.0,
-      endTime: 0.0,
-      loopBlendDuration: 0.35,
+      startTime: 0,
+      endTime: 12.3,
+      fps: 60,
+      loopBlendDuration: 0.1,
+      speed: 1,
     },
   },
   renderer: {
@@ -95,7 +97,9 @@ async function init() {
         rotation: CONFIG.models.character.rotation,
         startTime: CONFIG.models.character.startTime,
         endTime: CONFIG.models.character.endTime,
+        fps: CONFIG.models.character.fps,
         loopBlendDuration: CONFIG.models.character.loopBlendDuration,
+        speed: CONFIG.models.character.speed,
       },
       (progress) => {
         const mapped = 75 + (progress * 0.25);
@@ -174,7 +178,7 @@ function setupMusicPlayer() {
 
 function createCharacterSlot(scene) {
   const group = new THREE.Group();
-  
+
   const ringGeo = new THREE.RingGeometry(0.8, 0.95, 64);
   const ringMat = new THREE.MeshBasicMaterial({
     color: 0xff2d55,
@@ -281,9 +285,9 @@ function updateLoading(percent) {
   }
 
   const bars = [
-    { rectId: 'clip-left-rect',   totalH: 80  },
+    { rectId: 'clip-left-rect', totalH: 80 },
     { rectId: 'clip-center-rect', totalH: 110 },
-    { rectId: 'clip-right-rect',  totalH: 80  },
+    { rectId: 'clip-right-rect', totalH: 80 },
   ];
 
   const fillRatio = rounded / 100;

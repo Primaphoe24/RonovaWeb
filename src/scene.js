@@ -12,7 +12,7 @@ export function createScene() {
   const hemiLight = new THREE.HemisphereLight(0x0d0d18, 0x040408, 0.18);
   scene.add(hemiLight);
 
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.1);
   dirLight.position.set(4, 7, 4);
   dirLight.castShadow = true;
   dirLight.shadow.mapSize.width = 4096;
@@ -56,7 +56,7 @@ export function createScene() {
     uniforms: {
       innerRadius: { value: 5.0 },
       outerRadius: { value: 80.0 },
-      color:       { value: new THREE.Color(0x050509) },
+      color: { value: new THREE.Color(0x050509) },
     },
     vertexShader: /* glsl */`
       varying vec2 vUv;
@@ -85,8 +85,8 @@ export function createScene() {
       }
     `,
     transparent: true,
-    depthWrite:  false,
-    side:        THREE.FrontSide,
+    depthWrite: false,
+    side: THREE.FrontSide,
   });
 
   const groundMistGeometry = new THREE.CircleGeometry(80, 128);
@@ -100,7 +100,7 @@ export function createScene() {
   groundMistMaterial2.uniforms = {
     innerRadius: { value: 8.0 },
     outerRadius: { value: 80.0 },
-    color:       { value: new THREE.Color(0x050509) },
+    color: { value: new THREE.Color(0x050509) },
   };
   groundMistMaterial2.fragmentShader = /* glsl */`
     uniform float innerRadius;
