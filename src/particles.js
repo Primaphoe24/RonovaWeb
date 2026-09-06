@@ -39,49 +39,44 @@ function createCrowFeatherTexture() {
     c.restore();
   };
 
-  // Layer 1: Outer intense red aura glow
+  // Layer 1: Dark obsidian jet-black center fill (True black feather body)
+  ctx.save();
+  ctx.fillStyle = '#050103';
+  drawFeatherShape(ctx);
+  ctx.restore();
+
+  // Layer 2: Outer intense red aura glow stroke
   ctx.save();
   ctx.shadowColor = '#ff0033';
-  ctx.shadowBlur = 32;
-  ctx.strokeStyle = 'rgba(255, 0, 40, 0.9)';
-  ctx.lineWidth = 4;
+  ctx.shadowBlur = 28;
+  ctx.strokeStyle = 'rgba(255, 0, 40, 0.95)';
+  ctx.lineWidth = 3.5;
   strokeFeatherShape(ctx);
   ctx.restore();
 
-  // Layer 2: Secondary vibrant crimson edge glow
+  // Layer 3: Vibrant crimson edge stroke
   ctx.save();
   ctx.shadowColor = '#ff1a4d';
   ctx.shadowBlur = 14;
   ctx.strokeStyle = '#ff002b';
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 2.0;
   strokeFeatherShape(ctx);
   ctx.restore();
 
-  // Layer 3: Dark blood crimson center gradient fill
-  ctx.save();
-  const grad = ctx.createRadialGradient(256, 256, 10, 256, 256, 220);
-  grad.addColorStop(0.0, 'rgba(10, 0, 3, 0.98)');
-  grad.addColorStop(0.45, 'rgba(42, 0, 8, 0.96)');
-  grad.addColorStop(0.78, 'rgba(130, 0, 20, 0.98)');
-  grad.addColorStop(0.98, 'rgba(255, 0, 35, 1.0)');
-  ctx.fillStyle = grad;
-  drawFeatherShape(ctx);
-  ctx.restore();
-
-  // Layer 4: Sharp neon edge stroke
+  // Layer 4: Sharp neon red edge highlight
   ctx.save();
   ctx.shadowColor = '#ff4d73';
   ctx.shadowBlur = 6;
   ctx.strokeStyle = '#ff2b52';
-  ctx.lineWidth = 1.2;
+  ctx.lineWidth = 1.0;
   strokeFeatherShape(ctx);
   ctx.restore();
 
-  // Layer 5: Soft bright rim highlight stroke
+  // Layer 5: Bright crimson rim highlight stroke
   ctx.save();
   ctx.strokeStyle = '#ff99b3';
-  ctx.lineWidth = 0.6;
-  ctx.globalAlpha = 0.85;
+  ctx.lineWidth = 0.5;
+  ctx.globalAlpha = 0.9;
   strokeFeatherShape(ctx);
   ctx.restore();
 
@@ -131,22 +126,15 @@ export class ParticleSystem {
       roughness: 0.2,
       metalness: 0.3,
       emissiveMap: featherTexture,
-      emissive: new THREE.Color(0xff002b),
-      emissiveIntensity: 0.70,
+      emissive: new THREE.Color(0xff1a36),
+      emissiveIntensity: 0.90,
     });
 
     this.instancedMesh = new THREE.InstancedMesh(baseGeo, material, this.particleCount);
     this.instancedMesh.castShadow = false;
     this.instancedMesh.receiveShadow = false;
 
-    const featherColors = [
-      new THREE.Color(0xff0033),
-      new THREE.Color(0xd90024),
-      new THREE.Color(0xff2b4f),
-      new THREE.Color(0xaa0015),
-      new THREE.Color(0xff0055),
-      new THREE.Color(0x77000b),
-    ];
+    const whiteColor = new THREE.Color(0xffffff);
 
     for (let i = 0; i < this.particleCount; i++) {
       // Wider spatial bounds to prevent screen clutter
@@ -199,8 +187,7 @@ export class ParticleSystem {
         wobbleSpeed,
       });
 
-      const color = featherColors[Math.floor(Math.random() * featherColors.length)];
-      this.instancedMesh.setColorAt(i, color);
+      this.instancedMesh.setColorAt(i, whiteColor);
 
       this.dummy.position.copy(position);
       this.dummy.rotation.copy(baseRot);
