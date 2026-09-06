@@ -1,10 +1,42 @@
 import * as THREE from 'three';
 
+function createDarkRedSkyTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  // Pitch dark blood red sky gradient ("merah darah kegelapan")
+  const grad = ctx.createLinearGradient(0, 0, 0, 512);
+  grad.addColorStop(0.00, '#000000'); // Pure pitch black top
+  grad.addColorStop(0.30, '#040001'); // Near black void
+  grad.addColorStop(0.55, '#120003'); // Extremely dark blood crimson
+  grad.addColorStop(0.75, '#1a0004'); // Faint dark blood horizon
+  grad.addColorStop(0.90, '#060001'); // Fading dark abyss
+  grad.addColorStop(1.00, '#000000'); // Pure black ground base
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Extremely subtle dark blood sky aura
+  const radialGrad = ctx.createRadialGradient(256, 250, 10, 256, 250, 260);
+  radialGrad.addColorStop(0.0, 'rgba(40, 0, 6, 0.15)');
+  radialGrad.addColorStop(0.6, 'rgba(20, 0, 3, 0.08)');
+  radialGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
+
+  ctx.fillStyle = radialGrad;
+  ctx.fillRect(0, 0, 512, 512);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
+}
+
 export function createScene() {
   const scene = new THREE.Scene();
 
-  scene.fog = new THREE.FogExp2(0x0d0407, 0.024);
-  scene.background = new THREE.Color(0x070305);
+  scene.fog = new THREE.FogExp2(0x040001, 0.024);
+  scene.background = createDarkRedSkyTexture();
 
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.15);
   scene.add(ambientLight);

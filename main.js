@@ -16,11 +16,11 @@ const CONFIG = {
       position: [0, 0.15, 0],
       scale: 1,
       rotation: [0, 0, 0],
-      startTime: 0,
-      endTime: 12.3,
+      startTime: 176 / 60,
+      endTime: 1276 / 60,
       fps: 60,
-      loopBlendDuration: 0.1,
-      speed: 1,
+      loopBlendDuration: 0.5,
+      speed: 1.25,
     },
   },
   renderer: {
@@ -33,7 +33,7 @@ const CONFIG = {
 
 let renderer, camera, cameraController, typewriterManager, characterTouchHandler;
 let sceneData, modelLoader, particles, postProcessing;
-let clock, elapsedTime = 0;
+let clock, elapsedTime = 0, isFrozen = false;
 let frameCount = 0, fpsTime = 0;
 
 async function init() {
@@ -115,6 +115,7 @@ async function init() {
   updateLoading(100);
 
   setupCameraUI();
+  setupFreezeUI();
   setupMusicPlayer();
 
   setTimeout(() => {
@@ -127,6 +128,28 @@ async function init() {
 
   clock = new THREE.Clock();
   animate();
+}
+
+function setupFreezeUI() {
+  const btn = document.getElementById('freeze-btn');
+  if (!btn) return;
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    isFrozen = !isFrozen;
+
+    const camButtons = document.querySelectorAll('.cam-btn');
+
+    if (isFrozen) {
+      btn.classList.add('frozen');
+      btn.setAttribute('title', 'Unfreeze');
+      camButtons.forEach((b) => b.classList.add('disabled'));
+    } else {
+      btn.classList.remove('frozen');
+      btn.setAttribute('title', 'Freeze');
+      camButtons.forEach((b) => b.classList.remove('disabled'));
+    }
+  });
 }
 
 function setupMusicPlayer() {
@@ -246,6 +269,8 @@ function setupCameraUI() {
 
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
+      if (isFrozen) return;
+
       const camName = btn.dataset.cam;
 
       buttons.forEach((b) => {
@@ -315,11 +340,15 @@ function onResize() {
 function animate() {
   requestAnimationFrame(animate);
 
-  const deltaTime = clock.getDelta();
-  elapsedTime += deltaTime;
+  const rawDelta = clock.getDelta();
+  const deltaTime = isFrozen ? 0 : rawDelta;
+
+  if (!isFrozen) {
+    elapsedTime += deltaTime;
+  }
 
   cameraController.update(deltaTime);
-  modelLoader.update();
+  modelLoader.update(deltaTime);
   particles.update(elapsedTime, deltaTime, camera, modelLoader ? modelLoader.model : null);
 
   if (characterTouchHandler) {
@@ -334,7 +363,7 @@ function animate() {
   postProcessing.render(deltaTime);
 
   frameCount++;
-  fpsTime += deltaTime;
+  fpsTime += rawDelta;
   if (fpsTime >= 1.0) {
     const fps = Math.round(frameCount / fpsTime);
     const fpsEl = document.getElementById('fps-counter');

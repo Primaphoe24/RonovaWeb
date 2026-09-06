@@ -350,6 +350,66 @@ html, body {
   opacity: 1;
 }
 
+.freeze-btn {
+  position: fixed;
+  top: 24px;
+  right: 130px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 120;
+  pointer-events: auto;
+  transition: opacity 0.2s ease;
+  overflow: visible;
+}
+
+.freeze-btn:hover {
+  opacity: 0.7;
+}
+
+.freeze-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  display: block;
+  user-select: none;
+}
+
+.freeze-btn::after {
+  content: '';
+  position: absolute;
+  width: 1.5px;
+  height: 1em;
+  background: #ffffff;
+  border-radius: 1px;
+  transform: rotate(-45deg);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.freeze-btn.frozen::after {
+  opacity: 1;
+}
+
+.cam-btn.disabled {
+  opacity: 0.35 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.8) opacity(0.6);
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: none !important;
+}
+
+.cam-btn.disabled:hover {
+  background: transparent !important;
+  transform: none !important;
+}
+
 #camera-drawer {
   position: fixed;
   right: 0;
@@ -679,6 +739,11 @@ html, body {
   .music-btn {
     top: 14px;
     right: 64px;
+  }
+
+  .freeze-btn {
+    top: 14px;
+    right: 94px;
   }
 
   #camera-drawer {

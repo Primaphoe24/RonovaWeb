@@ -164,11 +164,11 @@ export class BroadRedFog {
     const geo = new THREE.PlaneGeometry(1, 1);
 
     const fogColors = [
-      new THREE.Color(0x7a000e),
-      new THREE.Color(0x570009),
-      new THREE.Color(0x940013),
-      new THREE.Color(0x380005),
-      new THREE.Color(0x6b000b),
+      new THREE.Color(0x2d0006),
+      new THREE.Color(0x1a0003),
+      new THREE.Color(0x3d0008),
+      new THREE.Color(0x120002),
+      new THREE.Color(0x220004),
     ];
 
     for (let i = 0; i < this.fogCount; i++) {
@@ -202,7 +202,7 @@ export class BroadRedFog {
       const driftSpeedZ = (Math.random() - 0.5) * 0.16;
       const rotSpeed = (Math.random() - 0.5) * 0.04;
 
-      const maxOpacity = 0.07 + Math.random() * 0.08;
+      const maxOpacity = 0.02 + Math.random() * 0.03;
 
       this.fogParticles.push({
         mesh,
@@ -225,7 +225,8 @@ export class BroadRedFog {
   }
 
   update(elapsedTime, deltaTime, camera) {
-    if (!deltaTime) deltaTime = 0.016;
+    if (deltaTime === 0) return;
+    if (deltaTime === undefined || deltaTime === null) deltaTime = 0.016;
 
     for (let i = 0; i < this.fogCount; i++) {
       const f = this.fogParticles[i];
@@ -477,7 +478,8 @@ export class CharacterAura {
   }
 
   update(elapsedTime, deltaTime, camera, model) {
-    if (!deltaTime) deltaTime = 0.016;
+    if (deltaTime === 0) return;
+    if (deltaTime === undefined || deltaTime === null) deltaTime = 0.016;
 
     if (model && !this.modelChecked) {
       this._detectWingNodes(model);

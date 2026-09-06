@@ -203,10 +203,11 @@ export class ModelLoader {
     return this.animations.map((clip) => clip.name);
   }
 
-  update() {
+  update(deltaTime) {
     if (!this.mixer || this.isPaused) return;
 
-    const delta = this.clock.getDelta();
+    const delta = deltaTime !== undefined ? deltaTime : this.clock.getDelta();
+    if (delta === 0) return;
     this.mixer.update(delta);
 
     if (this.loopPairs && this.loopPairs.length > 0) {
