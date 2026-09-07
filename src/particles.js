@@ -29,12 +29,20 @@ function createCrowFeatherTexture() {
     c.restore();
   };
 
-  const strokeFeatherShape = (c) => {
+  const strokeInnerVeins = (c) => {
     c.save();
     c.translate(256, 256);
     c.scale(2.15, 2.15);
     c.translate(-98, -63.5);
     c.stroke(featherSvgPath1);
+    c.restore();
+  };
+
+  const strokeOuterBorder = (c) => {
+    c.save();
+    c.translate(256, 256);
+    c.scale(2.15, 2.15);
+    c.translate(-98, -63.5);
     c.stroke(featherSvgPath2);
     c.restore();
   };
@@ -45,39 +53,54 @@ function createCrowFeatherTexture() {
   drawFeatherShape(ctx);
   ctx.restore();
 
-  // Layer 2: Outer intense red aura glow stroke
+  // Layer 2: Inner feather vein lines - Dark Blood Red
+  ctx.save();
+  ctx.shadowColor = '#4a0008';
+  ctx.shadowBlur = 8;
+  ctx.strokeStyle = '#6b000e';
+  ctx.lineWidth = 1.6;
+  strokeInnerVeins(ctx);
+  ctx.restore();
+
+  ctx.save();
+  ctx.strokeStyle = '#8c0012';
+  ctx.lineWidth = 0.9;
+  strokeInnerVeins(ctx);
+  ctx.restore();
+
+  // Layer 3: Outer border intense red aura glow stroke
   ctx.save();
   ctx.shadowColor = '#ff0033';
   ctx.shadowBlur = 28;
   ctx.strokeStyle = 'rgba(255, 0, 40, 0.95)';
   ctx.lineWidth = 3.5;
-  strokeFeatherShape(ctx);
+  strokeOuterBorder(ctx);
   ctx.restore();
 
-  // Layer 3: Vibrant crimson edge stroke
+  // Layer 4: Vibrant crimson outer edge stroke
   ctx.save();
   ctx.shadowColor = '#ff1a4d';
   ctx.shadowBlur = 14;
   ctx.strokeStyle = '#ff002b';
   ctx.lineWidth = 2.0;
-  strokeFeatherShape(ctx);
+  strokeOuterBorder(ctx);
   ctx.restore();
 
-  // Layer 4: Sharp neon red edge highlight
+  // Layer 5: Sharp neon red outer edge highlight
   ctx.save();
   ctx.shadowColor = '#ff4d73';
   ctx.shadowBlur = 6;
   ctx.strokeStyle = '#ff2b52';
   ctx.lineWidth = 1.0;
-  strokeFeatherShape(ctx);
+  strokeOuterBorder(ctx);
   ctx.restore();
 
-  // Layer 5: Bright crimson rim highlight stroke
+  // Layer 6: Bright crimson outer rim highlight stroke
   ctx.save();
   ctx.strokeStyle = '#ff99b3';
   ctx.lineWidth = 0.5;
   ctx.globalAlpha = 0.9;
-  strokeFeatherShape(ctx);
+  strokeOuterBorder(ctx);
   ctx.restore();
 
   const texture = new THREE.CanvasTexture(canvas);
