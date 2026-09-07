@@ -49,22 +49,15 @@ function createCrowFeatherTexture() {
 
   // Layer 1: Dark obsidian jet-black center fill (True black feather body)
   ctx.save();
-  ctx.fillStyle = '#050103';
+  ctx.fillStyle = '#020002';
   drawFeatherShape(ctx);
   ctx.restore();
 
-  // Layer 2: Inner feather vein lines - Extra Dark Dried Blood Red
+  // Layer 2: Inner feather vein lines - Pitch Dark Blood Red
   ctx.save();
-  ctx.shadowColor = '#150003';
-  ctx.shadowBlur = 4;
-  ctx.strokeStyle = '#280006';
-  ctx.lineWidth = 1.2;
-  strokeInnerVeins(ctx);
-  ctx.restore();
-
-  ctx.save();
-  ctx.strokeStyle = '#3d0009';
-  ctx.lineWidth = 0.7;
+  ctx.strokeStyle = '#180004';
+  ctx.lineWidth = 0.8;
+  ctx.globalAlpha = 0.6;
   strokeInnerVeins(ctx);
   ctx.restore();
 
